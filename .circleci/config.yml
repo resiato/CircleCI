@@ -23,6 +23,12 @@ jobs:
     # Add steps to the job
     steps:
       - run: echo world
+
+  print-name:
+    docker:
+      - image: cimg/base:2021.11
+    steps:
+      - run: echo I am called $MY_NAME
 # Invoke jobs via workflows
 workflows:
   #Name the workflow "welcome"
@@ -34,3 +40,6 @@ workflows:
       - print-world:
           requires:
             - print-hello
+      - print-name:
+          requires:
+            - print-world
