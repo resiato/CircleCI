@@ -8,38 +8,34 @@ orbs:
 
 # Define a job to be invoked later in a workflow.
 jobs:
-  print-hello:
+  save-hello-world-output:
     # Specify the execution environment.
     docker:
       - image: circleci/node:13.8.0
     # Add steps to the job
     steps:
-      - run: echo hello
+      - run: echo "hello world" > ~/output.txt
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - output.txt
 
-  print-world:
+  print-output-file:
     # Specify the execution environment
     docker:
       - image: circleci/node:13.8.0
     # Add steps to the job
     steps:
-      - run: echo world
+      - attach_workspace:
+          at: ~/
+      - run: cat ~/output.txt
 
-  print-name:
-    docker:
-      - image: cimg/base:2021.11
-    steps:
-      - run: echo I am called $MY_NAME
 # Invoke jobs via workflows
 workflows:
-  #Name the workflow "welcome"
-  welcome:
-    #Run the welcome/run job in its own container
+  #Name the workflow "my-workflow"
+  my-workflow:
     jobs:
-      - welcome/run
-      - print-hello
-      - print-world:
+      - save-hello-world-output
+      - print-output-file:
           requires:
-            - print-hello
-      - print-name:
-          requires:
-            - print-world
+            - save-hello-world-output
