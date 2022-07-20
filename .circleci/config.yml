@@ -2,6 +2,17 @@
 # See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
 # Use a package of configuration called an orb.
+defaults: &defaults
+  docker:
+    - image: circleci/node:13.8.0
+  working.directory: ~/CIRCLECI
+
+commands:
+  print_pipeline_id:
+    # A simple command that prints workflow ID from its environment variable
+    steps:
+      - run: echo ${CIRCLE_WORKFLOW_ID}
+
 orbs:
   # Declare a dependency on the welcome-orb
   welcome: circleci/welcome-orb@0.4.1
@@ -10,8 +21,7 @@ orbs:
 jobs:
   save-hello-world-output:
     # Specify the execution environment.
-    docker:
-      - image: circleci/node:13.8.0
+    <<: *defaults
     # Add steps to the job
     steps:
       - run: echo "hello world" > ~/output.txt
@@ -22,13 +32,17 @@ jobs:
 
   print-output-file:
     # Specify the execution environment
-    docker:
-      - image: circleci/node:13.8.0
+    <<: *defaults
     # Add steps to the job
     steps:
       - attach_workspace:
           at: ~/
       - run: cat ~/output.txt
+
+  print-workflow:
+    <<: *defaults
+    steps:
+      - print_pipeline_id
 
 # Invoke jobs via workflows
 workflows:
@@ -39,3 +53,4 @@ workflows:
       - print-output-file:
           requires:
             - save-hello-world-output
+      - print-workflow
