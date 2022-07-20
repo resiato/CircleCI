@@ -44,6 +44,15 @@ jobs:
     steps:
       - print_pipeline_id
 
+  print-error:
+    <<: *defaults
+    steps:
+      - run: exit 1
+      - run:
+        name: on error
+        command: echo "Oops, Error Alert!"
+        when: on_fail
+
 # Invoke jobs via workflows
 workflows:
   #Name the workflow "my-workflow"
@@ -54,3 +63,4 @@ workflows:
           requires:
             - save-hello-world-output
       - print-workflow
+      - print-error
